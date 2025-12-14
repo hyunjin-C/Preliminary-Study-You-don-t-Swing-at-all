@@ -188,6 +188,8 @@ public class PilotTestController : MonoBehaviour
 
     [Header("Data Logging")]
     public EMSLogger emsLogger;
+    public EMSCalibrationLogger calibrationLogger;
+
 
     float pressDuration1, releaseDuration1;
     float pressDuration2, releaseDuration2;
@@ -666,7 +668,7 @@ public class PilotTestController : MonoBehaviour
 
     // --- [!! 신규 3.1: 개별 테스트 함수 (총 15개) !!] ---
     // 공통 테스트 로직
-    private void TestValue(int channel, int value)
+    private void TestValue(int channel, int value, string calibType)
     {
         if (value < 0 || currentState == State.Testing)
         {
@@ -675,6 +677,13 @@ public class PilotTestController : MonoBehaviour
         }
         Debug.Log($"Testing CH{channel} value: {value}");
 
+        // Calibration 전용 로그 저장 (별도 CSV)
+        if (calibrationLogger != null)
+            calibrationLogger.LogCalibrationTest(channel, value, calibType);
+        else if (EMSCalibrationLogger.Instance != null)
+            EMSCalibrationLogger.Instance.LogCalibrationTest(channel, value, calibType);
+
+
         int[] intensities = new int[ChannelCount];
         intensities[channel - 1] = value; // 1-based to 0-based
         SendEmsCommand(intensities[0], intensities[1], intensities[2], intensities[3], intensities[4], intensities[5], pulseDurationSec);
@@ -682,29 +691,35 @@ public class PilotTestController : MonoBehaviour
     }
 
     // Channel 1
-    void TestMinPerception_Ch1() { TestValue(1, minPerceptions[0]); }
-    void TestMinActuation_Ch1() { TestValue(1, minActuations[0]); }
-    void TestMaxActuation_Ch1() { TestValue(1, maxActuations[0]); }
+    void TestMinPerception_Ch1() { TestValue(1, minPerceptions[0], "min_perception"); }
+    void TestMinActuation_Ch1() { TestValue(1, minActuations[0], "min_actuation"); }
+    void TestMaxActuation_Ch1() { TestValue(1, maxActuations[0], "max_actuation"); }
+
     // Channel 2
-    void TestMinPerception_Ch2() { TestValue(2, minPerceptions[1]); }
-    void TestMinActuation_Ch2() { TestValue(2, minActuations[1]); }
-    void TestMaxActuation_Ch2() { TestValue(2, maxActuations[1]); }
+    void TestMinPerception_Ch2() { TestValue(2, minPerceptions[1], "min_perception"); }
+    void TestMinActuation_Ch2() { TestValue(2, minActuations[1], "min_actuation"); }
+    void TestMaxActuation_Ch2() { TestValue(2, maxActuations[1], "max_actuation"); }
+
     // Channel 3
-    void TestMinPerception_Ch3() { TestValue(3, minPerceptions[2]); }
-    void TestMinActuation_Ch3() { TestValue(3, minActuations[2]); }
-    void TestMaxActuation_Ch3() { TestValue(3, maxActuations[2]); }
+    void TestMinPerception_Ch3() { TestValue(3, minPerceptions[2], "min_perception"); }
+    void TestMinActuation_Ch3() { TestValue(3, minActuations[2], "min_actuation"); }
+    void TestMaxActuation_Ch3() { TestValue(3, maxActuations[2], "max_actuation"); }
+
     // Channel 4
-    void TestMinPerception_Ch4() { TestValue(4, minPerceptions[3]); }
-    void TestMinActuation_Ch4() { TestValue(4, minActuations[3]); }
-    void TestMaxActuation_Ch4() { TestValue(4, maxActuations[3]); }
+    void TestMinPerception_Ch4() { TestValue(4, minPerceptions[3], "min_perception"); }
+    void TestMinActuation_Ch4() { TestValue(4, minActuations[3], "min_actuation"); }
+    void TestMaxActuation_Ch4() { TestValue(4, maxActuations[3], "max_actuation"); }
+
     // Channel 5
-    void TestMinPerception_Ch5() { TestValue(5, minPerceptions[4]); }
-    void TestMinActuation_Ch5() { TestValue(5, minActuations[4]); }
-    void TestMaxActuation_Ch5() { TestValue(5, maxActuations[4]); }
-    // Ch6
-    void TestMinPerception_Ch6() { TestValue(6, minPerceptions[5]); }
-    void TestMinActuation_Ch6() { TestValue(6, minActuations[5]); }
-    void TestMaxActuation_Ch6() { TestValue(6, maxActuations[5]); }
+    void TestMinPerception_Ch5() { TestValue(5, minPerceptions[4], "min_perception"); }
+    void TestMinActuation_Ch5() { TestValue(5, minActuations[4], "min_actuation"); }
+    void TestMaxActuation_Ch5() { TestValue(5, maxActuations[4], "max_actuation"); }
+
+    // Channel 6
+    void TestMinPerception_Ch6() { TestValue(6, minPerceptions[5], "min_perception"); }
+    void TestMinActuation_Ch6() { TestValue(6, minActuations[5], "min_actuation"); }
+    void TestMaxActuation_Ch6() { TestValue(6, maxActuations[5], "max_actuation"); }
+
 
 
     // --- [!! 신규 3.2: 채널별 Intensity 조절 !!] ---
