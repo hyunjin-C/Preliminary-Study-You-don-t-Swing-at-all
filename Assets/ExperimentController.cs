@@ -15,6 +15,14 @@ public class ExperimentController : MonoBehaviour
     // Ableton Live에 보낼 MIDI 마커 노트 번호
     private const byte MarkerNoteNumber = 48;
 
+    [Header("Trial Metadata (set these before Start)")]
+    public string pattern = "DefaultPattern"; // 예: "Swing_2_1"
+    public string task = "SF";                // "SF" or "MF"
+    public string guideType = "OP";           // "OP" or "PR"
+    public string location = "OF";            // "OF" or "FF"
+
+    private static readonly DateTime UnixEpoch =
+        new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
     void Start()
     {
@@ -75,11 +83,13 @@ public class ExperimentController : MonoBehaviour
         if (emsLogger != null)
         {
             emsLogger.StartNewTrial(
-                pattern: "DefaultPattern",
-                stimMode: "DefaultStimMode"
+                pattern: pattern,
+                task: task,
+                guideType: guideType,
+                location: location
             );
 
-            Debug.Log(">>> EMSLogger StartNewTrial() 호출 완료");
+            Debug.Log($">>> EMSLogger StartNewTrial() 호출 완료: {task}_{guideType}{location}_{pattern}");
         }
         else
         {

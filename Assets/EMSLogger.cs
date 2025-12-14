@@ -1,26 +1,34 @@
 using UnityEngine;
-using System; // DateTime.UtcNow를 사용하기 위해 필요
+using System;
 using System.IO;
 using System.Text;
+using System.Collections.Generic;
 
 /// <summary>
-/// [싱글톤 버전] EMS 데이터를 CSV 파일에 기록합니다. (유닉스 타임스탬프 사용)
+/// [Singleton] EMS 로그를 Unix time 기준 CSV로 기록
+/// - 모드(Task+GuideType+Location)별 버튼 클릭 index 관리
 /// </summary>
 public class EMSLogger : MonoBehaviour
 {
     public static EMSLogger Instance { get; private set; }
 
     private StreamWriter csvWriter;
-    private float trialStartTime = -1f; // 이 변수는 이제 타임스탬프 계산에 사용되지 않습니다.
+    private float trialStartTime = -1f;
 
-    // 현재 테스트(Trial)의 컨텍스트(맥락) 정보
+    // Trial context
     private string currentTrialID = "N/A";
     private string currentPattern = "N/A";
-    private string currentStimMode = "N/A";
+    private string currentTask = "N/A";       // SF / MF
+    private string currentGuideType = "N/A";  // OP / PR
+    private string currentLocation = "N/A";   // OF / FF
 
-    // 유닉스 Epoch 시간 (1970-01-01 UTC)
-    private static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+    // ===== 핵심 =====
+    // 모드별 버튼 클릭 횟수 관리
+    private Dictionary<string, int> modePressCount = new Dictionary<string, int>();
+    private int currentButtonIndex = -1;
 
+    private static readonly DateTime UnixEpoch =
+        new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
     void Awake()
     {
@@ -30,68 +38,107 @@ public class EMSLogger : MonoBehaviour
             return;
         }
         Instance = this;
-        DontDestroyOnLoad(gameObject); // 씬이 바뀌어도 유지
+        DontDestroyOnLoad(gameObject);
     }
 
     void Start()
     {
-        // 파일 저장 경로 (예: 내 문서)
         string folderPath = @"D:\hyunjin\Research\You don't Swing at all\[Preliminary Study] Experiement";
         string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
         string logPath = Path.Combine(folderPath, $"EMS_Log_{timestamp}.csv");
 
         try
         {
-            // CSV 파일 열고 헤더 작성
             csvWriter = new StreamWriter(logPath, false, Encoding.UTF8);
-            string header = "UnixTimestamp(s),TrialID,Pattern,StimMode,EventType,TargetChannel,TargetIntensity,TargetDuration(ms)";
+
+            string header =
+                "UnixTimestamp(s),TrialID,Pattern,Task,GuideType,Location,EventType,ButtonIndex,TargetChannel,TargetIntensity,TargetDuration(ms)";
+
             csvWriter.WriteLine(header);
             csvWriter.Flush();
+
             Debug.Log($"[EMSLogger] 로그 파일 생성 완료: {logPath}");
         }
-        catch (System.Exception e)
+        catch (Exception e)
         {
             Debug.LogError($"[EMSLogger] 파일 생성 실패: {e.Message}");
         }
     }
 
-    public void StartNewTrial(string pattern, string stimMode)
+    // =========================
+    // Trial 시작
+    // =========================
+    public void StartNewTrial(
+        string pattern,
+        string task,        // SF / MF
+        string guideType,   // OP / PR
+        string location     // OF / FF
+    )
     {
-        this.trialStartTime = 0f; // -1f가 아님을 표시
-        this.currentPattern = pattern;
-        this.currentStimMode = stimMode;
-        this.currentTrialID = $"{stimMode}_{pattern}_{DateTime.Now:HHmmss}";
+        trialStartTime = 0f;
+
+        currentPattern = pattern;
+        currentTask = task;
+        currentGuideType = guideType;
+        currentLocation = location;
+
+        // 여기서 modeKey 기준 버튼 인덱스 증가
+        string modeKey = $"{task}_{guideType}_{location}";
+        if (!modePressCount.ContainsKey(modeKey))
+            modePressCount[modeKey] = 0;
+
+        modePressCount[modeKey] += 1;
+        currentButtonIndex = modePressCount[modeKey];
+
+        currentTrialID =
+            $"{task}_{guideType}{location}_{pattern}_{DateTime.Now:HHmmss}";
 
         LogEvent("TRIAL_START");
     }
 
-    /// <summary>
-    /// PilotTestController가 테스트 종료 시 호출
-    /// </summary>
     public void StopTrial()
     {
         if (trialStartTime < 0) return;
+
         LogEvent("TRIAL_END");
-        trialStartTime = -1f; // 리셋
+        trialStartTime = -1f;
     }
 
-    /// <summary>
-    /// SendCommandToArduino에서 직접 호출
-    /// </summary>
+
+    // =========================
+    // EMS 명령 기록
+    // =========================
     public void LogEmsCommand(int channelID, int intensity, float durationMs)
     {
         if (trialStartTime < 0) return;
+
         LogEvent("EMS_SENT", channelID, intensity, durationMs);
     }
 
-
-    private void LogEvent(string eventType, int channelID = 0, int intensity = 0, float durationMs = 0)
+    private void LogEvent(
+        string eventType,
+        int channelID = 0,
+        int intensity = 0,
+        float durationMs = 0
+    )
     {
         if (csvWriter == null) return;
 
-        double unixTimestamp = (DateTime.UtcNow - UnixEpoch).TotalSeconds;
+        double unixTimestamp =
+            (DateTime.UtcNow - UnixEpoch).TotalSeconds;
 
-        string line = $"{unixTimestamp:F3},{currentTrialID},{currentPattern},{currentStimMode},{eventType},{channelID},{intensity},{(eventType == "EMS_SENT" ? durationMs.ToString("F0") : "")}";
+        string line =
+            $"{unixTimestamp:F3}," +
+            $"{currentTrialID}," +
+            $"{currentPattern}," +
+            $"{currentTask}," +
+            $"{currentGuideType}," +
+            $"{currentLocation}," +
+            $"{eventType}," +
+            $"{currentButtonIndex}," +
+            $"{channelID}," +
+            $"{intensity}," +
+            $"{(eventType == "EMS_SENT" ? durationMs.ToString("F0") : "")}";
 
         csvWriter.WriteLine(line);
         csvWriter.Flush();
@@ -100,6 +147,6 @@ public class EMSLogger : MonoBehaviour
     void OnApplicationQuit()
     {
         csvWriter?.Close();
-        Debug.Log("[EMSLogger] 자극 로그 저장됨.");
+        Debug.Log("[EMSLogger] EMS 로그 저장됨.");
     }
 }

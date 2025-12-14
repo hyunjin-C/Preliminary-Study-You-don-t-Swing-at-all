@@ -89,9 +89,9 @@ public class PilotTestController : MonoBehaviour
     public Button testMaxActuationButton_Ch5;
 
     [Header("UI Elements - Channel 6")]
-    public TMP_Text currentIntensityText_Ch6; // Ch5 현재 조절값
-    public Button increaseIntensityButton_Ch6; // Ch5 +
-    public Button decreaseIntensityButton_Ch6; // Ch5 -
+    public TMP_Text currentIntensityText_Ch6; // Ch6 현재 조절값
+    public Button increaseIntensityButton_Ch6; // Ch6 +
+    public Button decreaseIntensityButton_Ch6; // Ch6 -
     public TMP_Text minPerceptionValueText_Ch6;
     public Button saveMinPerceptionButton_Ch6;
     public Button testMinPerceptionButton_Ch6;
@@ -125,7 +125,6 @@ public class PilotTestController : MonoBehaviour
     public Button velocityWeakWeakButton;
     public Button velocityWeakStrongButton;
     public Button velocityStrongStrongButton;
-
 
     [Header("System Status")]
     public TMP_Text statusText;
@@ -190,7 +189,6 @@ public class PilotTestController : MonoBehaviour
     public EMSLogger emsLogger;
     public EMSCalibrationLogger calibrationLogger;
 
-
     float pressDuration1, releaseDuration1;
     float pressDuration2, releaseDuration2;
 
@@ -209,17 +207,15 @@ public class PilotTestController : MonoBehaviour
     {
         if (isConnected)
         {
-            SendEmsCommand(0, 0, 0, 0, 0, 0); // 5채널 OFF
+            SendEmsCommand(0, 0, 0, 0, 0, 0); // 6채널 OFF
             writer?.Close();
             client?.Close();
         }
     }
 
     // --- [!! 신규 1.4: UI 배열 초기화 함수 !!] ---
-    // (Unity 에디터에서 값을 다 연결한 후, 코드가 사용하기 쉽게 배열로 묶음)
     void PopulateUIArrays()
     {
-        // '현재 값' 텍스트 배열
         currentIntensityTexts[0] = currentIntensityText_Ch1;
         currentIntensityTexts[1] = currentIntensityText_Ch2;
         currentIntensityTexts[2] = currentIntensityText_Ch3;
@@ -227,7 +223,6 @@ public class PilotTestController : MonoBehaviour
         currentIntensityTexts[4] = currentIntensityText_Ch5;
         currentIntensityTexts[5] = currentIntensityText_Ch6;
 
-        // 'MinP' 텍스트 배열
         minPerceptionValueTexts[0] = minPerceptionValueText_Ch1;
         minPerceptionValueTexts[1] = minPerceptionValueText_Ch2;
         minPerceptionValueTexts[2] = minPerceptionValueText_Ch3;
@@ -235,7 +230,6 @@ public class PilotTestController : MonoBehaviour
         minPerceptionValueTexts[4] = minPerceptionValueText_Ch5;
         minPerceptionValueTexts[5] = minPerceptionValueText_Ch6;
 
-        // 'MinA' 텍스트 배열
         minActuationValueTexts[0] = minActuationValueText_Ch1;
         minActuationValueTexts[1] = minActuationValueText_Ch2;
         minActuationValueTexts[2] = minActuationValueText_Ch3;
@@ -243,7 +237,6 @@ public class PilotTestController : MonoBehaviour
         minActuationValueTexts[4] = minActuationValueText_Ch5;
         minActuationValueTexts[5] = minActuationValueText_Ch6;
 
-        // 'MaxA' 텍스트 배열
         maxActuationValueTexts[0] = maxActuationValueText_Ch1;
         maxActuationValueTexts[1] = maxActuationValueText_Ch2;
         maxActuationValueTexts[2] = maxActuationValueText_Ch3;
@@ -272,14 +265,14 @@ public class PilotTestController : MonoBehaviour
         }
     }
 
-    // --- [!! 수정됨 2.1: UI 리스너 (총 10 + 15 + 15 = 40개 버튼) !!] ---
+    // --- [!! 수정됨 2.1: UI 리스너 (중복 제거 버전) !!] ---
     void SetupUIListeners()
     {
         // 공통 캘리브레이션 버튼
         passButton.onClick.AddListener(OnPassButtonClicked);
         resetButton.onClick.AddListener(ResetStimulation); // EMS 즉시 정지
 
-        // 1. 채널별 '+ / -' 버튼 (총 10개)
+        // 1. 채널별 '+ / -' 버튼
         if (increaseIntensityButton_Ch1 != null) increaseIntensityButton_Ch1.onClick.AddListener(() => IncreaseIntensity(1));
         if (decreaseIntensityButton_Ch1 != null) decreaseIntensityButton_Ch1.onClick.AddListener(() => DecreaseIntensity(1));
         if (increaseIntensityButton_Ch2 != null) increaseIntensityButton_Ch2.onClick.AddListener(() => IncreaseIntensity(2));
@@ -293,7 +286,7 @@ public class PilotTestController : MonoBehaviour
         if (increaseIntensityButton_Ch6 != null) increaseIntensityButton_Ch6.onClick.AddListener(() => IncreaseIntensity(6));
         if (decreaseIntensityButton_Ch6 != null) decreaseIntensityButton_Ch6.onClick.AddListener(() => DecreaseIntensity(6));
 
-        // 2. 값별 'Save' 버튼 (총 15개)
+        // 2. 값별 'Save' 버튼
         if (saveMinPerceptionButton_Ch1 != null) saveMinPerceptionButton_Ch1.onClick.AddListener(SaveMinPerception_Ch1);
         if (saveMinActuationButton_Ch1 != null) saveMinActuationButton_Ch1.onClick.AddListener(SaveMinActuation_Ch1);
         if (saveMaxActuationButton_Ch1 != null) saveMaxActuationButton_Ch1.onClick.AddListener(SaveMaxActuation_Ch1);
@@ -318,7 +311,7 @@ public class PilotTestController : MonoBehaviour
         if (saveMinActuationButton_Ch6 != null) saveMinActuationButton_Ch6.onClick.AddListener(SaveMinActuation_Ch6);
         if (saveMaxActuationButton_Ch6 != null) saveMaxActuationButton_Ch6.onClick.AddListener(SaveMaxActuation_Ch6);
 
-        // 3. 값별 'Test' 버튼 (총 15개)
+        // 3. 값별 'Test' 버튼
         if (testMinPerceptionButton_Ch1 != null) testMinPerceptionButton_Ch1.onClick.AddListener(TestMinPerception_Ch1);
         if (testMinActuationButton_Ch1 != null) testMinActuationButton_Ch1.onClick.AddListener(TestMinActuation_Ch1);
         if (testMaxActuationButton_Ch1 != null) testMaxActuationButton_Ch1.onClick.AddListener(TestMaxActuation_Ch1);
@@ -343,6 +336,7 @@ public class PilotTestController : MonoBehaviour
         if (testMinActuationButton_Ch6 != null) testMinActuationButton_Ch6.onClick.AddListener(TestMinActuation_Ch6);
         if (testMaxActuationButton_Ch6 != null) testMaxActuationButton_Ch6.onClick.AddListener(TestMaxActuation_Ch6);
 
+        // Master Mode
         if (modeOneFingerButton != null)
             modeOneFingerButton.onClick.AddListener(() =>
             {
@@ -358,10 +352,11 @@ public class PilotTestController : MonoBehaviour
                 UpdateUIForState();
             });
 
-        // --- 공통 서브 모드 버튼 (OnlyFinger, FingerForearm) ---
+        // Sub Mode (OnlyFinger, FingerForearm) - (중복 제거: 1회만 등록)
         if (modeOnlyFingerButton != null)
             modeOnlyFingerButton.onClick.AddListener(() =>
             {
+
                 if (currentRhythmMode == RhythmPlaybackMode.OneFinger)
                 {
                     currentOneFingerMode = OneFingerStimMode.OnlyFinger;
@@ -373,6 +368,7 @@ public class PilotTestController : MonoBehaviour
                     Debug.Log("FourFinger Mode Set: Only Finger (Ch1-4)");
                 }
             });
+
         if (modeFingerForearmButton != null)
             modeFingerForearmButton.onClick.AddListener(() =>
             {
@@ -388,38 +384,7 @@ public class PilotTestController : MonoBehaviour
                 }
             });
 
-        // --- 공통 서브 모드 버튼 (PressRelease, FingerForearmPressRelease) ---
-        if (modePressReleaseButton != null)// --- 공통 서브 모드 버튼 (OnlyFinger, FingerForearm) ---
-            if (modeOnlyFingerButton != null)
-                modeOnlyFingerButton.onClick.AddListener(() =>
-                {
-                    if (currentRhythmMode == RhythmPlaybackMode.OneFinger)
-                    {
-                        currentOneFingerMode = OneFingerStimMode.OnlyFinger;
-                        Debug.Log("OneFinger Mode Set: Only Finger (Ch1->OFF)");
-                    }
-                    else
-                    {
-                        currentFourFingerMode = FourFingerStimMode.OnlyFinger;
-                        Debug.Log("FourFinger Mode Set: Only Finger (Ch1-4)");
-                    }
-                });
-        if (modeFingerForearmButton != null)
-            modeFingerForearmButton.onClick.AddListener(() =>
-            {
-                if (currentRhythmMode == RhythmPlaybackMode.OneFinger)
-                {
-                    currentOneFingerMode = OneFingerStimMode.FingerForearm;
-                    Debug.Log("OneFinger Mode Set: Finger & Forearm (Ch1+Ch5)");
-                }
-                else
-                {
-                    currentFourFingerMode = FourFingerStimMode.FingerForearm;
-                    Debug.Log("FourFinger Mode Set: Finger & Forearm (Ch1-4 + Ch5)");
-                }
-            });
-
-        // --- 공통 서브 모드 버튼 (PressRelease, FingerForearmPressRelease) ---
+        // Sub Mode (PressRelease, FingerForearmPressRelease) - (중복 제거: 1회만 등록)
         if (modePressReleaseButton != null)
             modePressReleaseButton.onClick.AddListener(() =>
             {
@@ -434,6 +399,7 @@ public class PilotTestController : MonoBehaviour
                     Debug.Log("FourFinger Mode Set: Only Finger + Press & Release (Ch1-4 -> Ch6)");
                 }
             });
+
         if (modeFingerForearmPressReleaseButton != null)
             modeFingerForearmPressReleaseButton.onClick.AddListener(() =>
             {
@@ -448,33 +414,7 @@ public class PilotTestController : MonoBehaviour
                     Debug.Log("FourFinger Mode Set: Finger & Forearm + Press & Release (Ch1-4+Ch5 -> Ch6)");
                 }
             });
-        modePressReleaseButton.onClick.AddListener(() =>
-        {
-            if (currentRhythmMode == RhythmPlaybackMode.OneFinger)
-            {
-                currentOneFingerMode = OneFingerStimMode.PressRelease;
-                Debug.Log("OneFinger Mode Set: Press & Release (Ch1->Ch6)");
-            }
-            else
-            {
-                currentFourFingerMode = FourFingerStimMode.PressRelease;
-                Debug.Log("FourFinger Mode Set: Only Finger + Press & Release (Ch1-4 -> Ch6)");
-            }
-        });
-        if (modeFingerForearmPressReleaseButton != null)
-            modeFingerForearmPressReleaseButton.onClick.AddListener(() =>
-            {
-                if (currentRhythmMode == RhythmPlaybackMode.OneFinger)
-                {
-                    currentOneFingerMode = OneFingerStimMode.FingerForearmPressRelease;
-                    Debug.Log("OneFinger Mode Set: Finger & Forearm + Press & Release (Ch1+Ch5->Ch6)");
-                }
-                else
-                {
-                    currentFourFingerMode = FourFingerStimMode.FingerForearmPressRelease;
-                    Debug.Log("FourFinger Mode Set: Finger & Forearm + Press & Release (Ch1-4+Ch5 -> Ch6)");
-                }
-            });
+
         if (straightPresetButton != null)
         {
             straightPresetButton.onClick.AddListener(() =>
@@ -484,8 +424,11 @@ public class PilotTestController : MonoBehaviour
                 currentVelocityMode = VelocityMode.WeakWeak;
                 string rhythmType = "Straight_1_1";
                 string modeStr = (currentRhythmMode == RhythmPlaybackMode.OneFinger) ? currentOneFingerMode.ToString() : currentFourFingerMode.ToString();
-                if (emsLogger != null) emsLogger.StartNewTrial(rhythmType, modeStr);
+                string task = GetTaskCode();
+                GetGuideAndLocationCodes(out string guide, out string location);
 
+                if (emsLogger != null)
+                    emsLogger.StartNewTrial(rhythmType, task, guide, location);
 
                 Debug.Log("Preset Set: Straight (8th, 1:1, WeakWeak)");
                 StartRhythmTest();
@@ -501,7 +444,11 @@ public class PilotTestController : MonoBehaviour
                 currentVelocityMode = VelocityMode.WeakStrong;
                 string rhythmType = "Swing_2_1";
                 string modeStr = (currentRhythmMode == RhythmPlaybackMode.OneFinger) ? currentOneFingerMode.ToString() : currentFourFingerMode.ToString();
-                if (emsLogger != null) emsLogger.StartNewTrial(rhythmType, modeStr);
+                string task = GetTaskCode();
+                GetGuideAndLocationCodes(out string guide, out string location);
+
+                if (emsLogger != null)
+                    emsLogger.StartNewTrial(rhythmType, task, guide, location);
 
                 Debug.Log("Preset Set: Swing (8th, 2:1, WeakStrong)");
                 StartRhythmTest();
@@ -528,7 +475,6 @@ public class PilotTestController : MonoBehaviour
         }
     }
 
-    // --- 모든 채널 UI 텍스트 업데이트 (저장된 값) ---
     void UpdateAllCalibrationUI()
     {
         for (int i = 0; i < ChannelCount; i++)
@@ -545,18 +491,14 @@ public class PilotTestController : MonoBehaviour
         UpdateUIForState();
     }
 
-    // --- [!! 수정됨 2.2: 단순화된 UI 상태 로직 !!] ---
     void UpdateUIForState()
     {
         calibrationPanel.SetActive(currentState == State.Calibrating || currentState == State.ReadyToTest);
         pilotTestPanel.SetActive(currentState == State.ReadyToTest || currentState == State.Testing);
 
-        // 캘리브레이션 중일 때만 +/- 및 Save 버튼 활성화
         bool isCalibrating = (currentState == State.Calibrating);
-        // 테스트 버튼은 테스트 중(Testing)이 아닐 때 항상 활성화
         bool canTest = (currentState != State.Testing);
 
-        // 모든 버튼의 활성화 상태를 루프로 설정
         if (increaseIntensityButton_Ch1 != null) increaseIntensityButton_Ch1.interactable = isCalibrating;
         if (decreaseIntensityButton_Ch1 != null) decreaseIntensityButton_Ch1.interactable = isCalibrating;
         if (saveMinPerceptionButton_Ch1 != null) saveMinPerceptionButton_Ch1.interactable = isCalibrating;
@@ -611,8 +553,6 @@ public class PilotTestController : MonoBehaviour
         if (testMinActuationButton_Ch6 != null) testMinActuationButton_Ch6.interactable = canTest;
         if (testMaxActuationButton_Ch6 != null) testMaxActuationButton_Ch6.interactable = canTest;
 
-
-        // 파일럿 테스트 버튼들
         bool testingButtonsActive = (currentState == State.ReadyToTest);
 
         if (modeOnlyFingerButton != null) modeOnlyFingerButton.gameObject.SetActive(testingButtonsActive);
@@ -620,7 +560,6 @@ public class PilotTestController : MonoBehaviour
         if (modePressReleaseButton != null) modePressReleaseButton.gameObject.SetActive(testingButtonsActive);
         if (modeFingerForearmPressReleaseButton != null) modeFingerForearmPressReleaseButton.gameObject.SetActive(testingButtonsActive);
 
-        // 마스터 모드 선택 버튼
         if (modeOneFingerButton != null) modeOneFingerButton.interactable = testingButtonsActive;
         if (modeFourFingerButton != null) modeFourFingerButton.interactable = testingButtonsActive;
 
@@ -640,7 +579,6 @@ public class PilotTestController : MonoBehaviour
         if (velocityWeakStrongButton != null) velocityWeakStrongButton.interactable = testingButtonsActive;
         if (velocityStrongStrongButton != null) velocityStrongStrongButton.interactable = testingButtonsActive;
 
-        // 상태별 지시 텍스트
         switch (currentState)
         {
             case State.Connecting: statusText.text = "Status: Connecting..."; break;
@@ -667,7 +605,6 @@ public class PilotTestController : MonoBehaviour
     }
 
     // --- [!! 신규 3.1: 개별 테스트 함수 (총 15개) !!] ---
-    // 공통 테스트 로직
     private void TestValue(int channel, int value, string calibType)
     {
         if (value < 0 || currentState == State.Testing)
@@ -677,12 +614,10 @@ public class PilotTestController : MonoBehaviour
         }
         Debug.Log($"Testing CH{channel} value: {value}");
 
-        // Calibration 전용 로그 저장 (별도 CSV)
         if (calibrationLogger != null)
             calibrationLogger.LogCalibrationTest(channel, value, calibType);
         else if (EMSCalibrationLogger.Instance != null)
             EMSCalibrationLogger.Instance.LogCalibrationTest(channel, value, calibType);
-
 
         int[] intensities = new int[ChannelCount];
         intensities[channel - 1] = value; // 1-based to 0-based
@@ -690,48 +625,38 @@ public class PilotTestController : MonoBehaviour
         StartCoroutine(StopStimulationAfterDelay(pulseDurationSec));
     }
 
-    // Channel 1
     void TestMinPerception_Ch1() { TestValue(1, minPerceptions[0], "min_perception"); }
     void TestMinActuation_Ch1() { TestValue(1, minActuations[0], "min_actuation"); }
     void TestMaxActuation_Ch1() { TestValue(1, maxActuations[0], "max_actuation"); }
 
-    // Channel 2
     void TestMinPerception_Ch2() { TestValue(2, minPerceptions[1], "min_perception"); }
     void TestMinActuation_Ch2() { TestValue(2, minActuations[1], "min_actuation"); }
     void TestMaxActuation_Ch2() { TestValue(2, maxActuations[1], "max_actuation"); }
 
-    // Channel 3
     void TestMinPerception_Ch3() { TestValue(3, minPerceptions[2], "min_perception"); }
     void TestMinActuation_Ch3() { TestValue(3, minActuations[2], "min_actuation"); }
     void TestMaxActuation_Ch3() { TestValue(3, maxActuations[2], "max_actuation"); }
 
-    // Channel 4
     void TestMinPerception_Ch4() { TestValue(4, minPerceptions[3], "min_perception"); }
     void TestMinActuation_Ch4() { TestValue(4, minActuations[3], "min_actuation"); }
     void TestMaxActuation_Ch4() { TestValue(4, maxActuations[3], "max_actuation"); }
 
-    // Channel 5
     void TestMinPerception_Ch5() { TestValue(5, minPerceptions[4], "min_perception"); }
     void TestMinActuation_Ch5() { TestValue(5, minActuations[4], "min_actuation"); }
     void TestMaxActuation_Ch5() { TestValue(5, maxActuations[4], "max_actuation"); }
 
-    // Channel 6
     void TestMinPerception_Ch6() { TestValue(6, minPerceptions[5], "min_perception"); }
     void TestMinActuation_Ch6() { TestValue(6, minActuations[5], "min_actuation"); }
     void TestMaxActuation_Ch6() { TestValue(6, maxActuations[5], "max_actuation"); }
 
-
-
-    // --- [!! 신규 3.2: 채널별 Intensity 조절 !!] ---
     void IncreaseIntensity(int channel)
     {
-        if (currentState != State.Calibrating) return; // 캘리브레이션 모드에서만 작동
+        if (currentState != State.Calibrating) return;
 
         int index = channel - 1;
         currentIntensities[index] += intensityStep;
         currentIntensityTexts[index].text = currentIntensities[index].ToString();
 
-        // 즉시 테스트 자극 전송
         SendTestPulse(channel, currentIntensities[index]);
     }
 
@@ -744,49 +669,43 @@ public class PilotTestController : MonoBehaviour
         if (currentIntensities[index] < 0) currentIntensities[index] = 0;
         currentIntensityTexts[index].text = currentIntensities[index].ToString();
 
-        // 즉시 테스트 자극 전송
         SendTestPulse(channel, currentIntensities[index]);
     }
 
-    // +/- 버튼 클릭 시 호출되는 공통 테스트 자극 함수
     void SendTestPulse(int channel, int intensity)
     {
         int[] intensities = new int[ChannelCount];
-        intensities[channel - 1] = intensity; // 1-based to 0-based
+        intensities[channel - 1] = intensity;
         SendEmsCommand(intensities[0], intensities[1], intensities[2], intensities[3], intensities[4], intensities[5], 1.0f);
         StartCoroutine(StopStimulationAfterDelay(1.0f));
     }
 
-
     void ResetStimulation()
     {
         if (currentState == State.Testing) return;
-        // 모든 '현재 값'과 텍스트를 0으로 리셋
+
         for (int i = 0; i < ChannelCount; i++)
         {
             currentIntensities[i] = 0;
             if (currentIntensityTexts[i] != null) currentIntensityTexts[i].text = "0";
         }
-        SendEmsCommand(0, 0, 0, 0, 0, 0); // All off
+        SendEmsCommand(0, 0, 0, 0, 0, 0);
         Debug.Log("Stimulation RESET to 0 by button.");
     }
 
     IEnumerator StopStimulationAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
-        // 캘리브레이션 중이거나 테스트 준비 상태일 때만 자동 정지
         if (currentState == State.Calibrating || currentState == State.ReadyToTest)
         {
-            SendEmsCommand(0, 0, 0, 0, 0, 0); // All off
+            SendEmsCommand(0, 0, 0, 0, 0, 0);
         }
     }
 
-    // --- [!! 신규 3.3: 개별 저장 함수 (총 15개) !!] ---
-    // 공통 저장 로직
     private void SaveValue(int channel, string valueType)
     {
         int index = channel - 1;
-        int valueToSave = currentIntensities[index]; // 현재 조절 중인 값을 가져옴
+        int valueToSave = currentIntensities[index];
 
         if (valueType == "MinPerception") minPerceptions[index] = valueToSave;
         else if (valueType == "MinActuation") minActuations[index] = valueToSave;
@@ -796,35 +715,33 @@ public class PilotTestController : MonoBehaviour
         PlayerPrefs.Save();
         Debug.Log($"CH{channel} {valueType} Saved: {valueToSave}");
 
-        UpdateAllCalibrationUI(); // 모든 UI 텍스트 업데이트 (저장된 값 포함)
-        SendEmsCommand(0, 0, 0, 0, 0, 0); // 자극 정지
+        UpdateAllCalibrationUI();
+        SendEmsCommand(0, 0, 0, 0, 0, 0);
     }
 
-    // Channel 1
     void SaveMinPerception_Ch1() { SaveValue(1, "MinPerception"); }
     void SaveMinActuation_Ch1() { SaveValue(1, "MinActuation"); }
     void SaveMaxActuation_Ch1() { SaveValue(1, "MaxActuation"); }
-    // Channel 2
+
     void SaveMinPerception_Ch2() { SaveValue(2, "MinPerception"); }
     void SaveMinActuation_Ch2() { SaveValue(2, "MinActuation"); }
     void SaveMaxActuation_Ch2() { SaveValue(2, "MaxActuation"); }
-    // Channel 3
+
     void SaveMinPerception_Ch3() { SaveValue(3, "MinPerception"); }
     void SaveMinActuation_Ch3() { SaveValue(3, "MinActuation"); }
     void SaveMaxActuation_Ch3() { SaveValue(3, "MaxActuation"); }
-    // Channel 4
+
     void SaveMinPerception_Ch4() { SaveValue(4, "MinPerception"); }
     void SaveMinActuation_Ch4() { SaveValue(4, "MinActuation"); }
     void SaveMaxActuation_Ch4() { SaveValue(4, "MaxActuation"); }
-    // Channel 5
+
     void SaveMinPerception_Ch5() { SaveValue(5, "MinPerception"); }
     void SaveMinActuation_Ch5() { SaveValue(5, "MinActuation"); }
     void SaveMaxActuation_Ch5() { SaveValue(5, "MaxActuation"); }
-    // Ch6
+
     void SaveMinPerception_Ch6() { SaveValue(6, "MinPerception"); }
     void SaveMinActuation_Ch6() { SaveValue(6, "MinActuation"); }
     void SaveMaxActuation_Ch6() { SaveValue(6, "MaxActuation"); }
-
 
     void StartTestCoroutine(IEnumerator testCoroutine)
     {
@@ -838,11 +755,9 @@ public class PilotTestController : MonoBehaviour
 
     void StartRhythmTest()
     {
-        // 마스터 모드에 따라 분기
         if (currentRhythmMode == RhythmPlaybackMode.FourFinger)
         {
-            // --- 4-Finger 모드 캘리브레이션 체크 ---
-            for (int i = 0; i < 4; i++) // Ch1-4
+            for (int i = 0; i < 4; i++)
             {
                 if (minActuations[i] < 0) { Debug.LogWarning($"Cannot start test: MinActuation (Ch{i + 1}) not calibrated."); return; }
                 if ((currentVelocityMode == VelocityMode.WeakStrong || currentVelocityMode == VelocityMode.StrongStrong) && maxActuations[i] < 0)
@@ -852,7 +767,6 @@ public class PilotTestController : MonoBehaviour
             {
                 if (minActuations[4] < 0 || maxActuations[4] < 0) { Debug.LogWarning($"Cannot start test: Ch5 (Forearm) not calibrated."); return; }
             }
-            // [!! 신규 !!] 4핑거 + 릴리즈 모드일 경우 Ch6 (릴리즈) 캘리브레이션 추가 확인
             if (currentFourFingerMode == FourFingerStimMode.PressRelease || currentFourFingerMode == FourFingerStimMode.FingerForearmPressRelease)
             {
                 if (minActuations[5] < 0) { Debug.LogWarning("Cannot start test: Ch6 (Release) MinActuation not calibrated."); return; }
@@ -863,20 +777,16 @@ public class PilotTestController : MonoBehaviour
             Debug.Log($"Mode: {currentFourFingerMode} | Timing: {currentTimingMode} | Length: {currentLengthMode} | Velocity: {currentVelocityMode}");
             StartTestCoroutine(PlayRhythmPattern_FourFinger());
         }
-        else // currentRhythmMode == RhythmPlaybackMode.OneFinger
+        else
         {
-            // --- 1-Finger 모드 캘리브레이션 체크 (Ch1, Ch5, Ch6) ---
-            // Ch1 (Press)
             if (minActuations[0] < 0) { Debug.LogWarning("Cannot start test: MinActuation (Ch1) not calibrated."); return; }
             if (currentVelocityMode != VelocityMode.WeakWeak && maxActuations[0] < 0) { Debug.LogWarning("Cannot start test: MaxActuation (Ch1) not calibrated."); return; }
 
-            // Ch5 (Forearm) - 필요한 모드일 때만
             if (currentOneFingerMode == OneFingerStimMode.FingerForearm || currentOneFingerMode == OneFingerStimMode.FingerForearmPressRelease)
             {
                 if (minActuations[4] < 0) { Debug.LogWarning("Cannot start test: Ch5 (Forearm) MinActuation not calibrated."); return; }
                 if (currentVelocityMode != VelocityMode.WeakWeak && maxActuations[4] < 0) { Debug.LogWarning("Cannot start test: Ch5 (Forearm) MaxActuation not calibrated."); return; }
             }
-            // Ch6 (Release) - 필요한 모드일 때만
             if (currentOneFingerMode == OneFingerStimMode.PressRelease || currentOneFingerMode == OneFingerStimMode.FingerForearmPressRelease)
             {
                 if (minActuations[5] < 0) { Debug.LogWarning("Cannot start test: Ch6 (Release) MinActuation not calibrated."); return; }
@@ -1222,4 +1132,47 @@ public class PilotTestController : MonoBehaviour
         Debug.Log("Loaded all 6-channel calibration data.");
         UpdateAllCalibrationUI();
     }
+
+    private string GetTaskCode()
+    {
+        return (currentRhythmMode == RhythmPlaybackMode.OneFinger) ? "SF" : "MF";
+    }
+
+    private void GetGuideAndLocationCodes(out string guide, out string location)
+    {
+        guide = "OP";
+        location = "OF";
+
+        if (currentRhythmMode == RhythmPlaybackMode.OneFinger)
+        {
+            // OneFingerStimMode: PressRelease / OnlyFinger / FingerForearm / FingerForearmPressRelease
+            switch (currentOneFingerMode)
+            {
+                case OneFingerStimMode.PressRelease:
+                    guide = "PR"; location = "OF"; break;
+                case OneFingerStimMode.OnlyFinger:
+                    guide = "OP"; location = "OF"; break;
+                case OneFingerStimMode.FingerForearm:
+                    guide = "OP"; location = "FF"; break;
+                case OneFingerStimMode.FingerForearmPressRelease:
+                    guide = "PR"; location = "FF"; break;
+            }
+        }
+        else
+        {
+            // FourFingerStimMode: PressRelease / OnlyFinger / FingerForearm / FingerForearmPressRelease
+            switch (currentFourFingerMode)
+            {
+                case FourFingerStimMode.PressRelease:
+                    guide = "PR"; location = "OF"; break;
+                case FourFingerStimMode.OnlyFinger:
+                    guide = "OP"; location = "OF"; break;
+                case FourFingerStimMode.FingerForearm:
+                    guide = "OP"; location = "FF"; break;
+                case FourFingerStimMode.FingerForearmPressRelease:
+                    guide = "PR"; location = "FF"; break;
+            }
+        }
+    }
+
 }
