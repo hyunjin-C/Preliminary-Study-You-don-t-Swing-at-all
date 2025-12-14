@@ -14123,7 +14123,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98c4407ed977a9c43bdf1972b4d00750, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  arduinoIpAddress: 192.168.7.200
+  arduinoIpAddress: 192.168.0.150
   arduinoPort: 80
   calibrationPanel: {fileID: 922489578}
   calibrationInstructionText: {fileID: 2075703713}

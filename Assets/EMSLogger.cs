@@ -36,7 +36,7 @@ public class EMSLogger : MonoBehaviour
     void Start()
     {
         // 파일 저장 경로 (예: 내 문서)
-        string folderPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments);
+        string folderPath = @"D:\hyunjin\Research\You don't Swing at all\[Preliminary Study] Experiement";
         string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
         string logPath = Path.Combine(folderPath, $"EMS_Log_{timestamp}.csv");
 

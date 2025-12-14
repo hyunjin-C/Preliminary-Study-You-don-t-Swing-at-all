@@ -8,7 +8,7 @@ using System.Collections; // Coroutines
 public class PilotTestController : MonoBehaviour
 {
     [Header("Network Settings")]
-    public string arduinoIpAddress = "192.168.7.200";
+    public string arduinoIpAddress = "192.168.0.150";
     public int arduinoPort = 80;
 
     // --- [!! 수정됨 1.1: 5채널 + 개별 Save/Test/Adjust UI !!] ---
